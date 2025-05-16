@@ -1,0 +1,3 @@
+v 1
+d Personal Github Page of Akirawisnu (wisnu_harto@yahoo.com)
+p universal language translation using Stata

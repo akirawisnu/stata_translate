@@ -1,0 +1,6 @@
+v 1
+d stata_translate Fast and Universal language translation for Stata dataframe
+d Wisnu Harto Adiwijoyo, Faculty of Economics Science, University of Goettingen
+d Distribution-Date: 20250515
+f stata_translate/stata_translate.ado
+f stata_translate/stata_translate.sthlp
