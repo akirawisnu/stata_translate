@@ -1,35 +1,45 @@
-*! version 0.1 16-May-2025 Akirawisnu: Stata Translate via GoogleTranslator using Python integration
+*! version 0.2 21-May-2025 Akirawisnu: Stata Translate via GoogleTranslator with varlist & pip install
 version 16.0
-cap prog drop stata_translate
 program define stata_translate, rclass
 
-    syntax varlist(min=1 max=1)
+    syntax varlist(min=1)
 
-    local varname `varlist'
-
-    // Check if variable exists and is string
-    capture confirm variable `varname'
-    if _rc {
-        di as error "Variable `varname' not found."
-        exit 198
-    }
-
-    quietly {
-        ds `varname', has(type string)
+    foreach varname of varlist `varlist'{
+        // Check if variable exists and is string
+        capture confirm variable `varname'
         if _rc {
-            di as error "Variable `varname' must be string type."
+            di as error "Variable `varname' not found."
             exit 198
-        }
-    }
+			}
+
+        quietly {
+            ds `varname', has(type string)
+            if _rc {
+                di as error "Variable `varname' must be string type."
+                exit 198
+				}
+			}
+		di "Processing: `varname'"
+        python: trns("`varname'")
+		qui: ren scrlang `varname'_scrlang
+		qui: ren translated `varname'_translated
+		}
 	
-	python: trns("`varname'")
-	
-	* Check the results in Stata
-	list `varname' scrlang translated in 1/5
-    di as result "Translation complete. New variables: scrlang, translated"
+    di as result "Translation complete. New variables: *_scrlang, *_translated"
 end
 
 python:
+import subprocess
+import importlib.util
+
+def ensure_package(pkg):
+    if importlib.util.find_spec(pkg) is None:
+        subprocess.check_call(["pip", "install", pkg])
+
+# Ensure required modules are installed
+ensure_package("deep_translator")
+ensure_package("langdetect")
+
 import pandas as pd
 from sfi import Data, SFIToolkit, Macro
 from deep_translator import GoogleTranslator
